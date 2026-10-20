@@ -1,7 +1,6 @@
 {% extends 'core/base.html' %}
 
 {% block contenido %}
-  <!-- Encabezado de página -->
   <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
     <h1 class="text-2xl font-bold">Servicios</h1>
     <a href="{% url 'crear_servicio' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors">
@@ -9,7 +8,6 @@
     </a>
   </div>
 
-  <!-- Formulario de búsqueda -->
   <form method="GET" class="mb-6 flex flex-wrap gap-2 items-center">
     <input 
       type="text" 
@@ -29,7 +27,6 @@
     {% endif %}
   </form>
 
-  <!-- Tabla de servicios -->
   <div class="overflow-x-auto border border-slate-200 rounded-lg">
     <table class="w-full text-left border-collapse">
       <thead class="bg-slate-100">
@@ -64,12 +61,10 @@
     </table>
   </div>
 
-  <!-- Paginación -->
   {% if servicios.paginator.num_pages > 1 %}
     <nav class="mt-6 flex justify-center items-center gap-4 text-sm" aria-label="Paginación">
-      <!-- Botón Anterior -->
       {% if servicios.has_previous %}
-        <a href="?{% if query %}q={{ query|urlencode }}&{% endif %}page={{ servicios.previous_page_number }}" 
+        <a href="?page={{ servicios.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" 
            class="text-blue-600 hover:text-blue-800 underline font-medium px-2 py-1">
           ← Anterior
         </a>
@@ -77,5 +72,18 @@
         <span class="text-slate-400 cursor-not-allowed px-2 py-1">← Anterior</span>
       {% endif %}
 
-      <!-- Indicador de página actual -->
-      <span class="text
+      <span class="text-slate-600 font-medium">
+        Página {{ servicios.number }} de {{ servicios.paginator.num_pages }}
+      </span>
+
+      {% if servicios.has_next %}
+        <a href="?page={{ servicios.next_page_number }}{% if query %}&q={{ query }}{% endif %}" 
+           class="text-blue-600 hover:text-blue-800 underline font-medium px-2 py-1">
+          Siguiente →
+        </a>
+      {% else %}
+        <span class="text-slate-400 cursor-not-allowed px-2 py-1">Siguiente →</span>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}
