@@ -1,12 +1,27 @@
+# Shortcuts de Django para renderizar, redirigir y manejar objetos/404
 from django.shortcuts import render, redirect, get_object_or_404
+
+# Conexión a la base de datos (utilizado en la vista inicio)
 from django.db import connection
+
+# Decorador de autenticación
 from django.contrib.auth.decorators import login_required
+
+# Funciones para manejo de sesión de usuario
 from django.contrib.auth import login, logout
+
+# Formularios integrados de autenticación
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+
+# Mensajes flash
 from django.contrib import messages
+
+# Paginador para dividir el listado
+from django.core.paginator import Paginator
+
+# Modelos y Formularios del proyecto
 from .models import Servicio
 from .forms import ServicioForm
-from django.core.paginator import Paginator
 
 
 def inicio(request):
@@ -18,27 +33,23 @@ def inicio(request):
     return render(request, 'core/inicio.html', contexto)
 
 
-# @login_required: si no hay sesión, manda a LOGIN_URL en lugar de ejecutar la vista
 @login_required
-# servicios: la vista del listado, ahora con búsqueda y paginación
 def servicios(request):
-    # filter(propietario=request.user): solo los servicios del usuario actual (Semana 6)
-    # order_by('-creado_en', '-id'): del más nuevo al más viejo; '-id' desempata si dos se crearon al mismo tiempo (paginar exige un orden fijo)
+    # Obtiene únicamente los servicios pertenecientes al usuario activo
     lista_servicios = Servicio.objects.filter(propietario=request.user).order_by('-creado_en', '-id')
-    # request.GET.get('q', ''): lee el texto buscado desde ?q=algo; '' si no hay búsqueda · strip() quita espacios sobrantes
+    
+    # Manejo del buscador (?q=)
     query = request.GET.get('q', '').strip()
-    # si el usuario escribió algo en el buscador...
     if query:
-        # titulo__icontains=query: WHERE titulo LIKE '%query%', sin distinguir mayúsculas/minúsculas
         lista_servicios = lista_servicios.filter(titulo__icontains=query)
-    # Paginator(lista, 5): agrupa los resultados (ya filtrados) en páginas de 5 registros cada una
+        
+    # Paginación de 5 en 5 elementos
     paginator = Paginator(lista_servicios, 5)
-    # request.GET.get('page'): lee el número de página desde la URL, ej. ?page=2
     numero_pagina = request.GET.get('page')
-    # get_page(): devuelve la página pedida; si no es un número da la 1, y si se pasa del total da la última
     pagina = paginator.get_page(numero_pagina)
-    # servicios: la página actual (se recorre igual que una lista) · query: para que el buscador recuerde lo escrito
+    
     return render(request, 'core/servicios.html', {'servicios': pagina, 'query': query})
+
 
 @login_required
 def crear_servicio(request):
