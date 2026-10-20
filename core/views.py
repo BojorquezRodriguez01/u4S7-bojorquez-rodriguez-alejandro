@@ -54,7 +54,7 @@ def servicios(request):
 @login_required
 def crear_servicio(request):
     if request.method == 'POST':
-        form = ServicioForm(request.POST)
+        form = ServicioForm(request.POST, request.FILES)
         if form.is_valid():
             nuevo = form.save(commit=False)
             nuevo.propietario = request.user
@@ -69,7 +69,7 @@ def crear_servicio(request):
 def editar_servicio(request, pk):
     servicio = get_object_or_404(Servicio, pk=pk, propietario=request.user)
     if request.method == 'POST':
-        form = ServicioForm(request.POST, instance=servicio)
+        form = ServicioForm(request.POST, request.FILES, instance=servicio)
         if form.is_valid():
             form.save()
             return redirect('servicios')
