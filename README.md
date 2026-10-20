@@ -1,42 +1,32 @@
-# 🚀 APLICAWEB - Semana 6: Autenticación, Sesiones y Aislamiento de Datos
+# Practica u4s7 — Pulido Funcional, UX y Simulacro de Defensa
 
 **Estudiante:** Alejandro Bojórquez Rodríguez  
-**Proyecto:** Sistema CRUD de Servicios con Django y MySQL en Aiven  
-**Despliegue:** [https://u3s6-bojorquezrodriguez-alejandro.onrender.com](https://u3s6-bojorquezrodriguez-alejandro.onrender.com)
+**Asignatura:** Aplicaciones Web (APLICAWEB - 4to Semestre)  
+**Proyecto Integrador:** Vitrina Web con CRUD y Autenticación de Usuarios
 
 ---
 
-## 📋 Descripción de la Práctica
+## 📌 Enlaces del Proyecto
 
-En esta sexta semana de la materia **APLICAWEB**, se implementó un sistema completo de autenticación de usuarios, gestión de sesiones seguras e integración de lógica de aislamiento de datos (*multitenancy* básico) sobre el CRUD desarrollado anteriormente. 
-
-Cada usuario registrado interactúa exclusivamente con sus propios datos, garantizando la privacidad y seguridad a nivel de base de datos y vistas.
-
----
-
-## 🛠️ Tecnologías Utilizadas
-
-* **Framework:** Django 5.x (Python 3.14)
-* **Base de Datos:** MySQL hospedado en **Aiven** (con conexión cifrada SSL)
-* **Estilos:** HTML5 + Tailwind CSS (vía Play CDN)
-* **Autenticación:** `django.contrib.auth` (`UserCreationForm`, `AuthenticationForm`, `@login_required`)
-* **Servidor de Producción / Hosting:** Render (Gunicorn + WhiteNoise)
+* 📁 **Repositorio en GitHub:** [u4S7-bojorquez-rodriguez-alejandro](https://github.com/BojorquezRodriguez01/u4S7-bojorquez-rodriguez-alejandro.git)  
+* 🌐 **Despliegue en Producción (Render):** [https://u4s7-bojorquez-rodriguez-alejandro.onrender.com](https://u4s7-bojorquez-rodriguez-alejandro.onrender.com)
 
 ---
 
-## ✨ Características Principales
+## 🛠️ Mejoras e Implementaciones de la Semana
 
-1. **Gestión de Cuentas de Usuario:**
-   * **Registro (`/registro/`):** Creación de nuevos usuarios con validación de contraseñas seguras y hashing PBKDF2 directo en la base de datos.
-   * **Inicio de Sesión (`/login/`):** Autenticación mediante cookies de sesión.
-   * **Cierre de Sesión (`/logout/`):** Invalidación de la sesión activa del usuario.
+Esta versión *"feature-complete"* consolida el trabajo de las 6 semanas anteriores agregando capa de usabilidad, accesibilidad y experiencia de usuario (UX):
 
-2. **Aislamiento de Datos por Usuario:**
-   * **Filtrado en Listado:** La consulta en la base de datos se realiza con `.filter(propietario=request.user)`, permitiendo que cada usuario vea únicamente los servicios que creó.
-   * **Asignación Automática:** Al crear un servicio (`/servicios/nuevo/`), el propietario se asigna automáticamente usando `request.user`.
+1. **Paginación con `Paginator`:** Listado segmentado en bloques de 5 registros para optimizar la navegación y la carga de datos.
+2. **Búsqueda Dinámica:** Filtro por título mediante consultas case-insensitive (`icontains`) que preserva la búsqueda al cambiar de página (`?q=...&page=...`).
+3. **Estados Vacíos Informativos:** Mensajes personalizados en la plantilla mediante `{% empty %}` diferenciando entre una lista sin registros y un resultado de búsqueda sin coincidencias.
+4. **Diseño Responsivo e Inclusivo (UI Review):** 
+   * Tabla adaptada para dispositivos móviles con `overflow-x-auto`.
+   * Atributos de accesibilidad `aria-label` en controles de navegación y búsqueda.
+   * Contraste y focos de teclado optimizados.
 
-3. **Seguridad y Control de Acceso:**
-   * **Protección de Vistas:** Decoradores `@login_required` para impedir el acceso directo por URL a usuarios no autenticados.
-   * **Candado en Edición y Borrado:** Verificación en vistas de actualización y eliminación mediante `get_object_or_404(Servicio, pk=pk, propietario=request.user)`, devolviendo un error **404 Not Found** si un usuario intenta alterar o eliminar el registro de otro usuario.
+---
 
-4. **Interfaz
+## 💻 Tecnologías Utilizadas
+
+* **Lenguaje &
