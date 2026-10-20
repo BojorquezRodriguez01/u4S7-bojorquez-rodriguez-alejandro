@@ -6,22 +6,39 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from .models import Servicio
 from .forms import ServicioForm
+from django.core.paginator import Paginator
 
 
 def inicio(request):
     info_bd = connection.settings_dict
-    contexto = {
+    contexto = { 
         'motor': info_bd['ENGINE'],
         'host': info_bd['HOST'],
     }
     return render(request, 'core/inicio.html', contexto)
 
 
+# @login_required: si no hay sesión, manda a LOGIN_URL en lugar de ejecutar la vista
 @login_required
+# servicios: la vista del listado, ahora con búsqueda y paginación
 def servicios(request):
-    lista_servicios = Servicio.objects.filter(propietario=request.user)
-    return render(request, 'core/servicios.html', {'servicios': lista_servicios})
-
+    # filter(propietario=request.user): solo los servicios del usuario actual (Semana 6)
+    # order_by('-creado_en', '-id'): del más nuevo al más viejo; '-id' desempata si dos se crearon al mismo tiempo (paginar exige un orden fijo)
+    lista_servicios = Servicio.objects.filter(propietario=request.user).order_by('-creado_en', '-id')
+    # request.GET.get('q', ''): lee el texto buscado desde ?q=algo; '' si no hay búsqueda · strip() quita espacios sobrantes
+    query = request.GET.get('q', '').strip()
+    # si el usuario escribió algo en el buscador...
+    if query:
+        # titulo__icontains=query: WHERE titulo LIKE '%query%', sin distinguir mayúsculas/minúsculas
+        lista_servicios = lista_servicios.filter(titulo__icontains=query)
+    # Paginator(lista, 5): agrupa los resultados (ya filtrados) en páginas de 5 registros cada una
+    paginator = Paginator(lista_servicios, 5)
+    # request.GET.get('page'): lee el número de página desde la URL, ej. ?page=2
+    numero_pagina = request.GET.get('page')
+    # get_page(): devuelve la página pedida; si no es un número da la 1, y si se pasa del total da la última
+    pagina = paginator.get_page(numero_pagina)
+    # servicios: la página actual (se recorre igual que una lista) · query: para que el buscador recuerde lo escrito
+    return render(request, 'core/servicios.html', {'servicios': pagina, 'query': query})
 
 @login_required
 def crear_servicio(request):
